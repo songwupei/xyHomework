@@ -1,0 +1,164 @@
+% xydailystudy.sty - 幼小衔接每日学习反馈模板样式文件
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{dailywork}[2023/09/17 Daily Work Template for Kindergarten-Primary Transition]
+
+% 加载必要的包
+\RequirePackage[UTF8]{ctex} % 中文支持
+\RequirePackage{geometry} % 页面布局
+\RequirePackage{tikz} % 绘图
+\RequirePackage{xcolor} % 颜色支持
+\RequirePackage{enumitem} % 列表控制
+\RequirePackage{graphicx} % 插入图片
+\RequirePackage{fontspec} % 字体设置
+\RequirePackage{twemojis} % Emoji支持
+\RequirePackage{ulem} % underlining
+
+% 设置中文字体
+\setCJKmainfont{Noto Serif CJK SC}
+\setCJKsansfont{Noto Sans CJK SC}
+\setCJKmonofont{Noto Mono CJK SC}
+
+% 页面设置
+\geometry{margin=1.5cm}
+
+% 自定义颜色
+\definecolor{pinyinbg}{RGB}{255, 230, 200}
+\definecolor{englishbg}{RGB}{200, 230, 255}
+\definecolor{hanzibg}{RGB}{230, 240, 250}
+\definecolor{mathbg}{RGB}{230, 255, 230}
+
+\definecolor{pinyintitle}{RGB}{200, 100, 50}
+\definecolor{englishtitle}{RGB}{50, 100, 200}
+\definecolor{hanzititle}{RGB}{70, 130, 180}
+\definecolor{mathtitle}{RGB}{50, 150, 50}
+
+% 日期格式
+\newcommand{\todaydate}{\the\year 年 \the\month 月 \the\day 日}
+
+% 定义拼音框环境
+\newenvironment{pinyinbox}
+  {\vspace{0.5cm}
+  \begin{tikzpicture}
+    \node[rectangle, text width=0.9\textwidth, fill=pinyinbg, 
+          rounded corners, draw=pinyintitle, thick, inner sep=8pt] (box) 
+    {\begin{minipage}{\textwidth}
+     \centering\bfseries\large\color{pinyintitle}拼音学习情况\\
+     \raggedright\normalfont\normalsize\color{black}}\\
+  {\end{minipage}};
+   \end{tikzpicture}}
+
+% 定义英语框环境
+\newenvironment{englishbox}
+  {\vspace{0.5cm}
+   \begin{tikzpicture}
+    \node[rectangle, text width=0.9\textwidth, fill=englishbg, 
+          rounded corners, draw=englishtitle, thick, inner sep=8pt] (box) 
+    {\begin{minipage}{\textwidth}
+     \centering\bfseries\large\color{englishtitle}英语学习情况\\
+     \raggedright\normalfont\normalsize\color{black}}\\
+  {\end{minipage}};
+   \end{tikzpicture}}
+
+% 定义识字框环境
+\newenvironment{hanzibox}
+  {\vspace{0.5cm}
+   \begin{tikzpicture}
+    \node[rectangle, text width=0.9\textwidth, fill=hanzibg, 
+          rounded corners, draw=hanzititle, thick, inner sep=8pt] (box) 
+    {\begin{minipage}{\textwidth}
+     \centering\bfseries\large\color{hanzititle}识字学习情况\\
+     \raggedright\normalfont\normalsize\color{black}}\\
+  {\end{minipage}};
+   \end{tikzpicture}}
+
+% 定义数学框环境
+\newenvironment{mathbox}
+  {\vspace{0.5cm}
+   \begin{tikzpicture}
+    \node[rectangle, text width=0.9\textwidth, fill=mathbg, 
+          rounded corners, draw=mathtitle, thick, inner sep=8pt] (box) 
+    {\begin{minipage}{\textwidth}
+     \centering\bfseries\large\color{mathtitle}数学学习情况\\
+     \raggedright\normalfont\normalsize\color{black}}\\
+  {\end{minipage}};
+   \end{tikzpicture}}
+
+% 设置列表间距
+\setlist[itemize]{topsep=0pt, itemsep=0pt, partopsep=0pt, parsep=0pt}
+\setlist[enumerate]{topsep=0pt, itemsep=0pt, partopsep=0pt, parsep=0pt}
+
+% 定义作业记录框-显示所有作业项目
+\newcommand{\homeworkrecordall}[4]{
+  \vspace{1cm}
+  \begin{center}
+    \begin{tikzpicture}
+        \node[rectangle, text width=0.9\textwidth, fill=white, 
+              rounded corners, draw=black, thick, inner sep=8pt] (box) 
+        {\begin{minipage}{0.9\textwidth}
+         \centering\bfseries\large\color{black}作业完成情况记录\\
+         \raggedright\normalfont\normalsize
+         \textbf{拼音作业：}#1 \hrulefill \\[0.2cm]
+         \hrulefill \\[0.3cm]
+         \textbf{英语作业：}#2 \hrulefill \\[0.2cm]
+         \hrulefill \\[0.3cm]
+         \textbf{识字作业：}#3 \hrulefill \\[0.2cm]
+         \hrulefill \\[0.3cm]
+         \textbf{数学作业：}#4 \hrulefill \\[0.2cm]
+         \hrulefill \\[0.3cm]
+         \textbf{完成情况：} \quad \texttwemoji{2705} 已完成 \quad \texttwemoji{1f7e8} 部分完成 \quad \texttwemoji{274c} 未完成\\[0.3cm]
+         \textbf{家长签字：} \hrulefill \\[0.2cm]
+         \textbf{日期：} \hrulefill
+         \end{minipage}};
+    \end{tikzpicture}
+  \end{center}
+}
+% 定义作业记录框 -只显示有的
+\newcommand{\homeworkrecord}[4]{%
+  \vspace{1cm}
+  \begin{center}
+    \begin{tikzpicture}
+        \node[rectangle, text width=0.9\textwidth, fill=white, 
+              rounded corners, draw=black, thick, inner sep=8pt] (box) 
+        {\begin{minipage}{0.9\textwidth}
+         \centering\bfseries\large\color{black}作业完成情况记录\\
+         \raggedright\normalfont\normalsize
+         % 拼音作业 - 只在#1非空时显示
+         \if\relax\detokenize{#1}\relax\else
+           \textbf{拼音作业：}\uline{#1} \\[0.2cm]
+         \fi
+         % 英语作业 - 只在#2非空时显示
+         \if\relax\detokenize{#2}\relax\else
+           \textbf{英语作业：}\uline{#2} \\[0.4cm]
+         \fi
+         % 识字作业 - 只在#3非空时显示
+         \if\relax\detokenize{#3}\relax\else
+           \textbf{识字作业：}\uline{#3} \\[0.4cm]
+         \fi
+         % 数学作业 - 只在#4非空时显示
+         \if\relax\detokenize{#4}\relax\else
+           \textbf{数学作业：}\uline{#4} \\[0.4cm]
+         \fi
+         \textbf{完成情况：} \quad \texttwemoji{2705} 已完成 \quad \texttwemoji{1f7e8} 部分完成 \quad \texttwemoji{274c} 未完成\\[0.3cm]
+         \textbf{家长签字：} \hrulefill \\[0.4cm]
+         \textbf{日期：} \hrulefill
+         \end{minipage}};
+    \end{tikzpicture}
+  \end{center}
+}
+
+% 定义评价符号
+\newcommand{\good}{\texttwemoji{1f60a}}
+\newcommand{\average}{\texttwemoji{1f642}}
+\newcommand{\poor}{\texttwemoji{1f610}}
+\newcommand{\book}{\texttwemoji{1f4da}}
+
+% 定义标题命令
+\newcommand{\dailytitle}[1]{
+  \begin{center}
+    \Huge \textbf{幼小衔接学习反馈} \\
+    \vspace{0.2cm}
+    \large {#1}
+  \end{center}
+}
+
+\endinput

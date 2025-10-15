@@ -1,0 +1,23 @@
+# LaTeX生成器配置文件
+api:
+  url: "https://api.deepseek.com/v1/chat/completions"
+  model: "deepseek-chat"
+  temperature: 0.3
+  max_tokens: 4000
+
+paths:
+  resource: "./resource"
+  input_dir: "~/NutstoreFiles/6-XY/2025年8月幼小衔接/"
+  output_dir: "./output"
+
+monitor:
+  check_interval_minutes: 60
+
+file_patterns:
+  input: "*.txt"  # 输入文件匹配模式
+  output: "*.tex" # 输出文件匹配模式
+
+latex:
+  document_class: "article"
+  font_size: "14pt"
+  style_file: "xydailystudy.sty"
