@@ -3,10 +3,10 @@ import re
 import schedule
 import time
 import requests
-import json
 from datetime import datetime
 from pathlib import Path
 import glob
+import subprocess
 
 from config_manager import ConfigManager
 
@@ -146,7 +146,7 @@ class LatexGenerator:
             return matches[0]
         
         # 如果没有代码块标记，尝试提取\begin{document} ... \end{document}之间的内容
-        doc_pattern = r'\\begin\{document\}.*?\\end\{document\}'
+        doc_pattern = r'\begin\{document\}.*?\end\{document\}'
         matches = re.findall(doc_pattern, text, re.DOTALL)
         
         if matches:
@@ -185,6 +185,112 @@ class LatexGenerator:
 请直接输出完整的LaTeX代码，包含\\documentclass和\\begin{{document}}...\\end{{document}}。
 """
         return prompt
+    
+    def compile_latex_file(self, latex_file_path):
+        """编译LaTeX文件为PDF"""
+        try:
+            # 获取当前文件的绝对路径的上一级文件夹
+            absolute_dir = Path(__file__).resolve().parent
+            # 确保输出目录存在
+            output_dir = "/".join([str(absolute_dir),os.path.dirname(latex_file_path)])
+            latex_file_path = "/".join([str(absolute_dir),latex_file_path])
+
+            
+            # 构建xelatex命令
+            command = [
+                'xelatex',
+                '-interaction=nonstopmode',
+                '-output-directory', output_dir,
+                latex_file_path
+            ]
+            print(command)
+            
+            print(f"正在编译LaTeX文件: {os.path.basename(latex_file_path)}")
+            
+            # 执行编译命令
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                cwd=output_dir
+            )
+            
+            if result.returncode == 0:
+                print(f"LaTeX编译成功")
+                
+                # 清理编译生成的临时文件
+                self.clean_latex_temp_files(latex_file_path)
+                return True
+            else:
+                print(f"LaTeX编译失败，返回码: {result.returncode}")
+                if result.stderr:
+                    print(f"错误输出: {result.stderr}")
+                return False
+                
+        except FileNotFoundError:
+            print("错误: 未找到xelatex命令，请确保LaTeX环境已安装")
+            return False
+        except Exception as e:
+            print(f"编译LaTeX文件时出错: {e}")
+            return False
+    
+    def clean_latex_temp_files(self, latex_file_path):
+        """清理LaTeX编译生成的临时文件"""
+        try:
+            base_name = os.path.splitext(latex_file_path)[0]
+            temp_extensions = ['.aux', '.log', '.out', '.toc']
+            
+            for ext in temp_extensions:
+                temp_file = base_name + ext
+                if os.path.exists(temp_file):
+                    os.remove(temp_file)
+                    print(f"已清理临时文件: {os.path.basename(temp_file)}")
+        except Exception as e:
+            print(f"清理临时文件时出错: {e}")
+    
+    def move_files_to_target_dirs(self, input_file_path, latex_file_path):
+        """将生成的文件移动到目标目录"""
+        try:
+            # 目标主目录
+            target_base_dir = "/home/song/NutstoreFiles/6-XY/2025年8月幼小衔接"
+            
+            # 目标子目录
+            pdf_target_dir = os.path.join(target_base_dir, "2-每日反馈")
+            tex_target_dir = os.path.join(target_base_dir, "3-每日反馈tex")
+            txt_target_dir = os.path.join(target_base_dir, "2-每日反馈txt")
+            
+            # 确保目标目录存在
+            os.makedirs(pdf_target_dir, exist_ok=True)
+            os.makedirs(tex_target_dir, exist_ok=True)
+            os.makedirs(txt_target_dir, exist_ok=True)
+            
+            filename_base = os.path.basename(input_file_path).replace('.txt', '')
+            
+            # 移动PDF文件
+            pdf_source_path = latex_file_path.replace('.tex', '.pdf')
+            pdf_target_path = os.path.join(pdf_target_dir, f"{filename_base}.pdf")
+            
+            if os.path.exists(pdf_source_path):
+                os.rename(pdf_source_path, pdf_target_path)
+                print(f"PDF文件已移动到: {pdf_target_path}")
+            
+            # 移动TEX文件
+            tex_target_path = os.path.join(tex_target_dir, f"{filename_base}.tex")
+            if os.path.exists(latex_file_path):
+                os.rename(latex_file_path, tex_target_path)
+                print(f"TEX文件已移动到: {tex_target_path}")
+            
+            # 移动TXT文件
+            txt_target_path = os.path.join(txt_target_dir, f"{filename_base}.txt")
+            if os.path.exists(input_file_path):
+                os.rename(input_file_path, txt_target_path)
+                print(f"TXT文件已移动到: {txt_target_path}")
+            
+            return True
+            
+        except Exception as e:
+            print(f"移动文件时出错: {e}")
+            return False
     
     def generate_latex_for_file(self, input_file_path):
         """为单个文件生成LaTeX"""
@@ -236,6 +342,13 @@ class LatexGenerator:
         # 提取LaTeX内容
         latex_content = self.extract_latex_content(api_response)
         
+        # 从文件名提取年份和月份
+        filename = os.path.basename(input_file_path)
+        output_filename = filename.replace('.txt', '.tex')
+        
+        # 默认输出目录
+        latex_output_path = os.path.join(self.output_dir, output_filename)
+        
         # 保存样式文件到输出目录（如果不存在）
         style_output_path = os.path.join(self.output_dir, self.latex_config['style_file'])
         if not os.path.exists(style_output_path):
@@ -243,9 +356,9 @@ class LatexGenerator:
                 f.write(style_content)
             print(f"样式文件已保存: {style_output_path}")
         
+        print(f"输出目录: {self.output_dir}")
+    
         # 保存生成的LaTeX文件
-        output_filename = filename.replace('.txt', '.tex')
-        latex_output_path = os.path.join(self.output_dir, output_filename)
         with open(latex_output_path, 'w', encoding='utf-8') as f:
             f.write(latex_content)
         print(f"LaTeX文件已保存: {latex_output_path}")
@@ -254,7 +367,20 @@ class LatexGenerator:
         file_size = os.path.getsize(latex_output_path)
         print(f"生成的LaTeX文件大小: {file_size} 字节")
         
-        return True
+        # 自动编译生成的LaTeX文件
+        if self.compile_latex_file(latex_output_path):
+            print(f"LaTeX文件编译成功: {output_filename.replace('.tex', '.pdf')}")
+            
+            # 移动文件到目标目录
+            if self.move_files_to_target_dirs(input_file_path, latex_output_path):
+                print("文件移动完成")
+            else:
+                print("文件移动失败")
+            
+            return True
+        else:
+            print(f"LaTeX文件编译失败: {output_filename}")
+            return False
     
     def generate_all_latex_files(self):
         """生成所有文件的LaTeX"""
@@ -284,7 +410,16 @@ class LatexGenerator:
             # 检查对应的输出文件是否存在
             filename = os.path.basename(file_path)
             output_filename = filename.replace('.txt', '.tex')
-            output_path = os.path.join(self.output_dir, output_filename)
+            
+            # 构建对应的输出路径
+            date_match = re.search(r'(\d{4})(\d{2})(\d{2})', filename)
+            if date_match:
+                year = date_match.group(1)
+                month = date_match.group(2)
+                month_str = f"{year}年{int(month)}月"
+                output_path = os.path.join(self.output_dir, f"{year}年", f"{month_str}幼小衔接", output_filename)
+            else:
+                output_path = os.path.join(self.output_dir, output_filename)
             
             # 如果输出文件不存在，或者输入文件比输出文件新，则需要处理
             if not os.path.exists(output_path) or \

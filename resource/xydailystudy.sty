@@ -1,6 +1,6 @@
 % xydailystudy.sty - 幼小衔接每日学习反馈模板样式文件
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{dailywork}[2023/09/17 Daily Work Template for Kindergarten-Primary Transition]
+\ProvidesPackage{xydailystudy}[2023/09/17 Daily Work Template for Kindergarten-Primary Transition]
 
 % 加载必要的包
 \RequirePackage[UTF8]{ctex} % 中文支持
@@ -43,9 +43,11 @@
           rounded corners, draw=pinyintitle, thick, inner sep=8pt] (box) 
     {\begin{minipage}{\textwidth}
      \centering\bfseries\large\color{pinyintitle}拼音学习情况\\
-     \raggedright\normalfont\normalsize\color{black}}\\
-  {\end{minipage}};
-   \end{tikzpicture}}
+     \raggedright\normalfont\normalsize\color{black}
+     \end{minipage}};
+   \end{tikzpicture}
+  }
+  {}
 
 % 定义英语框环境
 \newenvironment{englishbox}
@@ -55,9 +57,11 @@
           rounded corners, draw=englishtitle, thick, inner sep=8pt] (box) 
     {\begin{minipage}{\textwidth}
      \centering\bfseries\large\color{englishtitle}英语学习情况\\
-     \raggedright\normalfont\normalsize\color{black}}\\
-  {\end{minipage}};
-   \end{tikzpicture}}
+     \raggedright\normalfont\normalsize\color{black}
+     \end{minipage}};
+   \end{tikzpicture}
+  }
+  {}
 
 % 定义识字框环境
 \newenvironment{hanzibox}
@@ -67,9 +71,10 @@
           rounded corners, draw=hanzititle, thick, inner sep=8pt] (box) 
     {\begin{minipage}{\textwidth}
      \centering\bfseries\large\color{hanzititle}识字学习情况\\
-     \raggedright\normalfont\normalsize\color{black}}\\
-  {\end{minipage}};
+     \raggedright\normalfont\normalsize\color{black}
+     \end{minipage}};
    \end{tikzpicture}}
+  {}
 
 % 定义数学框环境
 \newenvironment{mathbox}
@@ -79,9 +84,11 @@
           rounded corners, draw=mathtitle, thick, inner sep=8pt] (box) 
     {\begin{minipage}{\textwidth}
      \centering\bfseries\large\color{mathtitle}数学学习情况\\
-     \raggedright\normalfont\normalsize\color{black}}\\
-  {\end{minipage}};
-   \end{tikzpicture}}
+     \raggedright\normalfont\normalsize\color{black}
+     \end{minipage}};
+   \end{tikzpicture}
+  }
+  {}
 
 % 设置列表间距
 \setlist[itemize]{topsep=0pt, itemsep=0pt, partopsep=0pt, parsep=0pt}
